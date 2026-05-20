@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>LGU DriveDB</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <h1>LGU DriveDB</h1>
+      <p>Vehicle Importation Registry System</p>
+    </div>
+  </header>
+
+  <main>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <section class="top-bar">
+
+      <div class="stats">
+        <div class="card">
+          <h2>{{ vehicles | length }}</h2>
+          <span>Total Vehicles</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <input type="text" id="searchInput" placeholder="Search vehicle...">
+        <button id="openModalBtn">Register Vehicle</button>
+      </div>
+
+    </section>
+
+    <section class="table-section">
+
+      <table id="vehicleTable">
+
+        <thead>
+          <tr>
+            <th>Donate ID</th>
+            <th>Vehicle Description</th>
+            <th>Car Type</th>
+            <th>VIN</th>
+            <th>Color</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          {% for v in vehicles %}
+          <tr>
+            <td>{{ v[0] }}</td>
+            <td>{{ v[1] }}</td>
+            <td>{{ v[2] }}</td>
+            <td>{{ v[3] if v[3] else 'N/A' }}</td>
+            <td>{{ v[4] if v[4] else 'N/A' }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="empty">
+              No registered vehicles found.
+            </td>
+          </tr>
+          {% endfor %}
+
+        </tbody>
+
+      </table>
+
+    </section>
+
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+
+    <div class="modal">
+
+      <div class="modal-header">
+        <h2>Register Vehicle</h2>
+        <button id="closeModalBtn">&times;</button>
+      </div>
+
+      <form action="{{ url_for('submit_vehicle') }}" method="POST">
+
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Application ID</label>
+            <input type="text" name="ApplicationID" required>
+          </div>
+
+          <div class="form-group">
+            <label>Donate ID</label>
+            <input type="text" name="DonateID" required>
+          </div>
+
+          <div class="form-group full">
+            <label>Vehicle Description</label>
+            <input type="text" name="VehicleDescription" required>
+          </div>
+
+          <div class="form-group">
+            <label>Vehicle Tariff</label>
+            <input type="number" name="VehicleTariff" required>
+          </div>
+
+          <div class="form-group">
+            <label>Origin</label>
+            <input type="text" name="Origin" required>
+          </div>
+
+          <div class="form-group full">
+            <label>Car Type</label>
+
+            <select name="CarType" id="CarType" required>
+              <option value="">Select Type</option>
+              <option value="Passenger Car">Passenger Car</option>
+              <option value="Commercial Truck">Commercial Truck</option>
+              <option value="Special Purpose Truck">Special Purpose Truck</option>
+              <option value="Industrial Truck">Industrial Truck</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div id="passengerFields">
+
+          <hr>
+
+          <div class="form-grid">
+
+            <div class="form-group full">
+              <label>VIN</label>
+              <input type="text" name="VIN">
+            </div>
+
+            <div class="form-group">
+              <label>Color</label>
+              <input type="text" name="Color">
+            </div>
+
+            <div class="form-group">
+              <label>Year Model</label>
+              <input type="number" name="YearModel">
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="form-buttons">
+          <button type="button" class="cancel" id="cancelBtn">
+            Cancel
+          </button>
+
+          <button type="submit" class="submit">
+            Submit
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
