@@ -1,0 +1,523 @@
+{% extends 'base.html' %}
+{% block title %}Application Intake — VIS{% endblock %}
+
+{% block content %}
+<style>
+  .form-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0 80px 0;
+  }
+
+  .master-registration-card {
+    background: #1a1a1e;
+    width: 100%;
+    max-width: 760px;
+    border: 1px solid #29292e;
+    border-radius: 12px;
+    padding: 48px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 
+                0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .form-main-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 12px;
+  }
+
+  .form-main-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-muted, #a8a8b3);
+    margin-bottom: 48px;
+  }
+
+  .section-divider {
+    border-top: 1px solid #29292e;
+    margin: 44px 0;
+    padding-top: 20px;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+
+  .radio-pill-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 40px;
+    justify-content: center; 
+    background: #121214;
+    padding: 16px 24px;
+    border-radius: 8px;
+    border: 1px solid #29292e;
+    margin-bottom: 28px;
+  }
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .radio-circle, .checkbox-square {
+    transform: scale(1.2);
+  }
+
+  select, input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 6px;
+    border: 1px solid #29292e;
+    background-color: #121214;
+    color: #ffffff;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--warning, #f1c40f);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .full-width {
+    grid-column: span 2;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #a8a8b3;
+    margin-bottom: 8px;
+  }
+
+  .required-star {
+    color: #e74c3c;
+    margin-left: 3px;
+  }
+
+  .vehicle-entry-node {
+    background: #151518;
+    border: 1px solid #222226;
+    padding: 24px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  
+  .remove-node-btn {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: #c0392b; color: white;
+    border: none; padding: 6px 12px;
+    border-radius: 4px; cursor: pointer;
+    font-size: 11px; font-weight: 600;
+  }
+  
+  .action-secondary-btn {
+    background: transparent;
+    border: 1px dashed #f1c40f;
+    color: #f1c40f;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+</style>
+
+<div class="form-wrapper">
+  <div class="master-registration-card">
+    
+    <h2 class="form-main-title">LGU-DRIVE REGISTRATION FORM</h2>
+    <p class="form-main-subtitle">Vehicle Importation Document Tracking System Console</p>
+
+    <form action="{{ url_for('submit_vehicle') }}" method="POST" onsubmit="return validateFormSubmission(event)">
+      
+      <div class="section-title" style="color: #399cff;">Donor / Supplier Status</div>
+      
+      <div class="radio-pill-box">
+        <label class="radio-label">
+          <input type="radio" name="DonorStatus" value="new" id="donorToggleNew" class="radio-circle" style="accent-color: #399cff;">
+          New Donor
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="DonorStatus" value="existing" id="donorToggleExisting" class="radio-circle" style="accent-color: #399cff;">
+          Existing Donor
+        </label>
+      </div>
+
+      <div id="donorDropdownContainer" style="display: none; margin-bottom: 28px;">
+        <label style="font-weight: 600;">Choose Target Existing Corporate Profile</label>
+        <select id="donorSelect">
+          <option value="">-- Choose Donor Record from Database Registry --</option>
+          {% for d in donors %}
+            <option value="{{ d.id }}">{{ d.name }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="ExistingDonorID" id="hiddenDonorID">
+      </div>
+
+      <div class="form-grid" id="donorFieldsGrid" style="display: none; margin-bottom: 28px;">
+        <div class="full-width">
+          <label>Name of Donor / Supplier <span class="required-star">*</span></label>
+          <input type="text" name="DonorName" id="donor_name" placeholder="Seoul Charity Foundation">
+        </div>
+        <div class="full-width">
+          <label>Donor Complete Address <span class="required-star">*</span></label>
+          <input type="text" name="DonorAddress" id="donor_addr" placeholder="12 Sejong-daero, Jung-gu, Seoul">
+        </div>
+        <div>
+          <label>Telephone Number</label>
+          <input type="text" name="DonorTelNo" id="donor_tel" placeholder="Optional">
+        </div>
+        <div>
+          <label>Fax Number</label>
+          <input type="text" name="DonorFaxNo" id="donor_fax" placeholder="Optional">
+        </div>
+        <div class="full-width">
+          <label>Email Address</label>
+          <input type="email" name="DonorEmail" id="donor_email" placeholder="Optional">
+        </div>
+      </div>
+
+
+      <div class="section-divider"></div>
+      <div class="section-title" style="color: #2ecc71;">Donee / Consignee Status</div>
+      
+      <div class="radio-pill-box">
+        <label class="radio-label">
+          <input type="radio" name="DoneeStatus" value="new" id="doneeToggleNew" class="radio-circle" style="accent-color: #2ecc71;">
+          New Donee
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="DoneeStatus" value="existing" id="doneeToggleExisting" class="radio-circle" style="accent-color: #2ecc71;">
+          Existing Donee
+        </label>
+      </div>
+
+      <div id="doneeDropdownContainer" style="display: none; margin-bottom: 28px;">
+        <label style="font-weight: 600;">Choose Target Existing Donee Profile</label>
+        <select id="doneeSelect">
+          <option value="">-- Choose Donee LGU from Database Registry --</option>
+          {% for e in donees %}
+            <option value="{{ e.id }}">{{ e.name }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="ExistingDoneeID" id="hiddenDoneeID">
+      </div>
+
+      <div class="form-grid" id="doneeFieldsGrid" style="display: none; margin-bottom: 28px;">
+        <div class="full-width">
+          <label>Name of Donee / Consignee <span class="required-star">*</span></label>
+          <input type="text" name="DoneeName" id="donee_name" placeholder="Province of Laguna">
+        </div>
+        <div class="full-width">
+          <label>Complete Business Address <span class="required-star">*</span></label>
+          <input type="text" name="DoneeAddress" id="donee_addr" placeholder="Brgy. San Isidro, Laguna">
+        </div>
+        <div class="full-width">
+          <label>Designated Contact Person <span class="required-star">*</span></label>
+          <input type="text" name="ContactPerson" id="donee_cont" placeholder="Mica Reyes">
+        </div>
+        <div>
+          <label>Telephone Number</label>
+          <input type="text" name="DoneeTelNo" id="donee_tel" placeholder="Optional">
+        </div>
+        <div>
+          <label>Fax Number</label>
+          <input type="text" name="DoneeFaxNo" id="donee_fax" placeholder="Optional">
+        </div>
+        <div class="full-width">
+          <label>Email Address</label>
+          <input type="email" name="DoneeEmail" id="donee_email" placeholder="Optional">
+        </div>
+      </div>
+
+
+      <div id="coreVehicleAssetPanel" style="display: none;">
+        <div class="section-divider"></div>
+        <div class="section-title" style="color: #f1c40f;">C. Asset Classification Selection</div>
+        
+        <div class="radio-pill-box" style="margin-bottom: 32px;">
+          <label class="radio-label">
+            <input type="checkbox" id="checkToggleMotor" class="checkbox-square" style="accent-color: #f1c40f;">
+            Include Motor Vehicles
+          </label>
+          <label class="radio-label">
+            <input type="checkbox" id="checkTogglePassenger" class="checkbox-square" style="accent-color: #f1c40f;">
+            Include a Passenger Car
+          </label>
+        </div>
+
+        <div id="standardVehiclePanel" style="display: none; margin-bottom: 32px;">
+          <div style="font-size: 13px; font-weight: 600; color: #f1c40f; margin-bottom: 16px; text-transform: uppercase;">Motor Vehicles Fleet List</div>
+          <div id="motorVehicleContainer">
+            <div class="vehicle-entry-node">
+              <div class="form-grid">
+                <div class="full-width">
+                  <label>Vehicle Description Model <span class="required-star">*</span></label>
+                  <input type="text" name="VehicleDescription[]" class="motor-input" placeholder="Ford F-650 / Kenworth T680">
+                </div>
+                <div>
+                  <label>Tariff Heading Code <span class="required-star">*</span></label>
+                  <input type="number" name="VehicleTariff[]" class="motor-input" placeholder="8704">
+                </div>
+                <div>
+                  <label>Quantity <span class="required-star">*</span></label>
+                  <input type="number" name="Quantity[]" class="motor-input" min="1" placeholder="1">
+                </div>
+                <div class="full-width">
+                  <label>Country of Origin <span class="required-star">*</span></label>
+                  <input type="text" name="Origin[]" class="motor-input" placeholder="USA">
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="action-secondary-btn" id="addVehicleNodeBtn">+ Add Another Motor Vehicle to This Record</button>
+        </div>
+
+        <div id="passengerVehiclePanel" style="display: none; margin-bottom: 28px; border-left: 3px solid #2ecc71; padding-left: 20px;">
+          <div style="font-size: 13px; font-weight: 600; color: #2ecc71; margin-bottom: 16px; text-transform: uppercase;">Passenger Car Properties</div>
+          <div class="form-grid">
+            <div>
+              <label>Make & Model Description <span class="required-star">*</span></label>
+              <input type="text" name="VehicleDescriptionSingle" id="pass_desc" class="passenger-input" placeholder="Honda Civic">
+            </div>
+            <div>
+              <label>Year Model Generation <span class="required-star">*</span></label>
+              <input type="number" name="YearModel" class="passenger-input" placeholder="2022">
+            </div>
+            <div>
+              <label>Engine Displacement <span class="required-star">*</span></label>
+              <input type="text" name="EngineDisplacement" class="passenger-input" placeholder="1500 cc">
+            </div>
+            <div>
+              <label>Body Color Paint <span class="required-star">*</span></label>
+              <input type="text" name="Color" class="passenger-input" placeholder="Black">
+            </div>
+            <div class="full-width">
+              <label>Vehicle Identification Number <span class="required-star">*</span></label>
+              <input type="text" name="VIN" class="passenger-input" placeholder="Enter strict 17-character unique operational code" style="font-family: monospace; text-transform: uppercase;">
+            </div>
+            <div>
+              <label>Date of Initial Local Registration</label>
+              <input type="date" name="RegistrationDate">
+            </div>
+            <div>
+              <label>Engine Serial Number <span class="required-star">*</span></label>
+              <input type="text" name="EngineNumber" class="passenger-input" placeholder="6ASDF334455">
+            </div>
+            <div>
+              <label>Type of Fuel Engine <span class="required-star">*</span></label>
+              <select name="FuelType" class="passenger-input" style="background: #121214;">
+                <option value="G">Gasoline</option>
+                <option value="D">Diesel</option>
+                <option value="E">Electric</option>
+              </select>
+            </div>
+            <div>
+              <label>Gross Vehicle Weight</label>
+              <input type="number" name="VehicleWeight" placeholder="1300">
+            </div>
+            <input type="hidden" name="VehicleTariffSingle" value="8703">
+            <input type="hidden" name="OriginSingle" value="Japan">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px; justify-content: flex-end; margin-top: 40px;">
+          <button type="reset" style="background: transparent; border: 1px solid #29292e; color: #ffffff; padding: 12px 24px; border-radius: 6px; cursor: pointer;">Clear Form</button>
+          <button type="submit" style="background: #2ecc71; border: none; color: #ffffff; padding: 12px 32px; font-weight: 600; border-radius: 6px; cursor: pointer;">Save Application</button>
+        </div>
+
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  const donorsDictionary = {{ donors | tojson if donors else '[]' }};
+  const doneesDictionary = {{ donees | tojson if donees else '[]' }};
+
+  const donorToggleNew = document.getElementById('donorToggleNew');
+  const donorToggleExisting = document.getElementById('donorToggleExisting');
+  const donorDropContainer = document.getElementById('donorDropdownContainer');
+  const donorSelectEl = document.getElementById('donorSelect');
+  const donorFieldsGrid = document.getElementById('donorFieldsGrid');
+  const hiddenDonorInput = document.getElementById('hiddenDonorID');
+
+  const doneeToggleNew = document.getElementById('doneeToggleNew');
+  const doneeToggleExisting = document.getElementById('doneeToggleExisting');
+  const doneeDropContainer = document.getElementById('doneeDropdownContainer');
+  const doneeSelectEl = document.getElementById('doneeSelect');
+  const doneeFieldsGrid = document.getElementById('doneeFieldsGrid');
+  const hiddenDoneeInput = document.getElementById('hiddenDoneeID');
+  
+  const assetPanelMaster = document.getElementById('coreVehicleAssetPanel');
+
+  const drName=document.getElementById('donor_name'), drAddr=document.getElementById('donor_addr'), drTel=document.getElementById('donor_tel'), drFax=document.getElementById('donor_fax'), drEmail=document.getElementById('donor_email');
+  const dName=document.getElementById('donee_name'), dAddr=document.getElementById('donee_addr'), dCont=document.getElementById('donee_cont'), dTel=document.getElementById('donee_tel'), dFax=document.getElementById('donee_fax'), dEmail=document.getElementById('donee_email');
+
+  function checkWorkflowState() {
+    const donorDone = donorToggleNew.checked || (donorToggleExisting.checked && donorSelectEl.value !== "");
+    const doneeDone = doneeToggleNew.checked || (doneeToggleExisting.checked && doneeSelectEl.value !== "");
+    assetPanelMaster.style.display = (donorDone && doneeDone) ? 'block' : 'none';
+  }
+
+  function handleDonorViewChange() {
+    donorFieldsGrid.style.display = 'grid';
+    if (donorToggleExisting.checked) {
+      donorDropContainer.style.display = 'block';
+      toggleInputsReadOnly(donorFieldsGrid, true);
+      toggleInputsRequired(donorFieldsGrid, false);
+    } else {
+      donorDropContainer.style.display = 'none';
+      donorSelectEl.value = ""; hiddenDonorInput.value = "";
+      toggleInputsReadOnly(donorFieldsGrid, false);
+      toggleInputsRequired(donorFieldsGrid, true, ['donor_tel', 'donor_fax', 'donor_email']);
+      clearInputs(donorFieldsGrid);
+    }
+    checkWorkflowState();
+  }
+  donorToggleNew.addEventListener('change', handleDonorViewChange);
+  donorToggleExisting.addEventListener('change', handleDonorViewChange);
+  
+  donorSelectEl.addEventListener('change', function() {
+    const match = donorsDictionary.find(d => String(d.id) === String(this.value));
+    if(match) {
+      hiddenDonorInput.value = match.id; drName.value = match.name || ''; drAddr.value = match.address || '';
+      drTel.value = match.tel || ''; drFax.value = match.fax || ''; drEmail.value = match.email || '';
+    } else { hiddenDonorInput.value = ""; clearInputs(donorFieldsGrid); }
+    checkWorkflowState();
+  });
+
+  function handleDoneeViewChange() {
+    doneeFieldsGrid.style.display = 'grid';
+    if (doneeToggleExisting.checked) {
+      doneeDropContainer.style.display = 'block';
+      toggleInputsReadOnly(doneeFieldsGrid, true);
+      toggleInputsRequired(doneeFieldsGrid, false);
+    } else {
+      doneeDropContainer.style.display = 'none';
+      doneeSelectEl.value = ""; hiddenDoneeInput.value = "";
+      toggleInputsReadOnly(doneeFieldsGrid, false);
+      toggleInputsRequired(doneeFieldsGrid, true, ['donee_tel', 'donee_fax', 'donee_email']);
+      clearInputs(doneeFieldsGrid);
+    }
+    checkWorkflowState();
+  }
+  doneeToggleNew.addEventListener('change', handleDoneeViewChange);
+  doneeToggleExisting.addEventListener('change', handleDoneeViewChange);
+  
+  doneeSelectEl.addEventListener('change', function() {
+    const match = doneesDictionary.find(e => String(e.id) === String(this.value));
+    if(match) {
+      hiddenDoneeInput.value = match.id; dName.value = match.name || ''; dAddr.value = match.address || ''; 
+      dCont.value = match.contact || ''; dTel.value = match.tel || ''; dFax.value = match.fax || ''; dEmail.value = match.email || '';
+    } else { hiddenDoneeInput.value = ""; clearInputs(doneeFieldsGrid); }
+    checkWorkflowState();
+  });
+
+  function toggleInputsReadOnly(container, state) { container.querySelectorAll('input').forEach(i => i.readOnly = state); }
+  function toggleInputsRequired(container, state, bypassList = []) {
+    container.querySelectorAll('input').forEach(i => {
+      if (bypassList.includes(i.id)) i.required = false;
+      else i.required = state;
+    });
+  }
+  function clearInputs(container) { container.querySelectorAll('input').forEach(i => i.value = ""); }
+
+  // Dynamic Motor Vehicle Appender Loop (Fixed placeholder injection)
+  const motorVehicleContainer = document.getElementById('motorVehicleContainer');
+  const addVehicleNodeBtn = document.getElementById('addVehicleNodeBtn');
+
+  addVehicleNodeBtn.addEventListener('click', function() {
+    const nodeIndex = motorVehicleContainer.children.length + 1;
+    const newNode = document.createElement('div');
+    newNode.className = 'vehicle-entry-node';
+    newNode.innerHTML = `
+      <button type="button" class="remove-node-btn" onclick="this.parentElement.remove()">Remove Item</button>
+      <div style="font-size:11px; color:#f1c40f; margin-bottom:12px; text-transform:uppercase; font-weight:600;">Staged Vehicle Allocation Item #${nodeIndex}</div>
+      <div class="form-grid">
+        <div class="full-width">
+          <label>Vehicle Description Model <span class="required-star">*</span></label>
+          <input type="text" name="VehicleDescription[]" class="motor-input" placeholder="Ford F-650 / Kenworth T680" required>
+        </div>
+        <div>
+          <label>Tariff Heading Code <span class="required-star">*</span></label>
+          <input type="number" name="VehicleTariff[]" class="motor-input" placeholder="8704" required>
+        </div>
+        <div>
+          <label>Quantity <span class="required-star">*</span></label>
+          <input type="number" name="Quantity[]" class="motor-input" min="1" placeholder="1" required>
+        </div>
+        <div class="full-width">
+          <label>Country of Origin <span class="required-star">*</span></label>
+          <input type="text" name="Origin[]" class="motor-input" placeholder="USA" required>
+        </div>
+      </div>
+    `;
+    motorVehicleContainer.appendChild(newNode);
+  });
+
+  const checkToggleMotor = document.getElementById('checkToggleMotor');
+  const checkTogglePassenger = document.getElementById('checkTogglePassenger');
+  const stdPanel = document.getElementById('standardVehiclePanel');
+  const passPanel = document.getElementById('passengerVehiclePanel');
+  
+  function syncVehiclePanels() {
+    stdPanel.style.display = checkToggleMotor.checked ? 'block' : 'none';
+    passPanel.style.display = checkTogglePassenger.checked ? 'block' : 'none';
+    
+    document.querySelectorAll('.motor-input').forEach(i => i.required = checkToggleMotor.checked);
+    document.querySelectorAll('.passenger-input').forEach(i => i.required = checkTogglePassenger.checked);
+  }
+  checkToggleMotor.addEventListener('change', syncVehiclePanels);
+  checkTogglePassenger.addEventListener('change', syncVehiclePanels);
+
+  function validateFormSubmission(event) {
+    if (!checkToggleMotor.checked && !checkTogglePassenger.checked) {
+      alert("Validation Error:\nPlease select at least one vehicle type to include (Motor Vehicle or Passenger Car).");
+      event.preventDefault();
+      return false;
+    }
+
+    if (donorToggleNew.checked && !drTel.value.trim() && !drFax.value.trim() && !drEmail.value.trim()) { 
+      alert("Validation Error:\nPlease provide at least one contact method for the New Donor (Telephone, Fax, or Email)."); 
+      drTel.focus(); event.preventDefault(); return false; 
+    }
+    if (doneeToggleNew.checked && !dTel.value.trim() && !dFax.value.trim() && !dEmail.value.trim()) { 
+      alert("Validation Error:\nPlease provide at least one contact method for the New Donee (Telephone, Fax, or Email)."); 
+      dTel.focus(); event.preventDefault(); return false; 
+    }
+    return true;
+  }
+</script>
+{% endblock %}
