@@ -9,15 +9,17 @@ from datetime import date
 # ========================================================
 # SYSTEM CONFIGURATION & INITIALIZATION
 # ========================================================
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder='../templates',
+            static_folder='../static')
 app.secret_key = 'super_secret_session_key'
 
 # Database Connection Parameters
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'adidog' 
-app.config['MYSQL_DB'] = 'importationform'
-
+app.config['MYSQL_HOST']     = 'zephyr.proxy.rlwy.net'
+app.config['MYSQL_USER']     = 'root'
+app.config['MYSQL_PASSWORD'] = 'aZLUGLIFlwAzyDqsEsEGIavWAqsnJaxc'
+app.config['MYSQL_DB']       = 'importationform'
+app.config['MYSQL_PORT']     = 37168
 mysql = MySQL(app)
 
 # ========================================================
