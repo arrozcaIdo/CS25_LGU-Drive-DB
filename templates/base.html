@@ -39,14 +39,12 @@
         <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
       </div>
     </div>
-
     <div class="content-area">
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% for category, message in messages %}
           <div class="alert alert-{{ category }}">{{ message }}</div>
         {% endfor %}
       {% endwith %}
-
       {% block content %}{% endblock %}
     </div>
   </main>

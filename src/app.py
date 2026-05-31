@@ -66,6 +66,7 @@ def history():
     """)
     records = cur.fetchall()
     cur.close()
+    filters = {'search': request.args.get('search', '')}
     return render_template('history.html', records=records)
 
 # ========================================================
