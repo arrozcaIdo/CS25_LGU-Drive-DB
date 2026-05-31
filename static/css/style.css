@@ -1,0 +1,454 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --background:    #121214;
+  --surface:       #1a1a1e;
+  --surface2:      #29292e;
+  --border:        #29292e;
+  --text:          #e1e1e6;
+  --text-muted:    #a8a8b3;
+  --accent-blue:   #399cff;
+  --accent-green:  #2ecc71;
+  --accent-yellow: #f1c40f;
+  --accent-red:    #e74c3c;
+  --sidebar-w:     260px;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+}
+
+/* =============================================
+   BASE — Sidebar Overlay
+   ============================================= */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  display: none;
+  z-index: 998;
+}
+.sidebar-overlay.active { display: block; }
+
+/* =============================================
+   BASE — Sidebar Drawer
+   ============================================= */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: calc(-1 * var(--sidebar-w));
+  width: var(--sidebar-w);
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar.active { left: 0; }
+
+.sidebar-brand {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-icon  { font-size: 24px; }
+.brand-title { font-weight: 700; font-size: 16px; letter-spacing: 0.5px; color: #fff; }
+.brand-sub   { font-size: 11px; color: var(--text-muted); }
+
+.nav-links {
+  list-style: none;
+  padding: 16px 0;
+  margin: 0;
+  flex-grow: 1;
+}
+.nav-links li { padding: 4px 16px; }
+.nav-links a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.nav-links a:hover,
+.nav-links a.active {
+  background: var(--surface2);
+  color: #fff;
+}
+
+/* =============================================
+   BASE — Main Frame
+   ============================================= */
+.main-content {
+  margin-left: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 64px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.topbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.burger-btn {
+  font-size: 22px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.burger-btn:hover { background: var(--surface2); }
+
+.page-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.content-area {
+  padding: 32px 24px;
+  flex-grow: 1;
+}
+
+/* =============================================
+   BASE — Flash Alerts
+   ============================================= */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.alert-success {
+  background: rgba(46,204,113,0.15);
+  color: var(--accent-green);
+  border: 1px solid rgba(46,204,113,0.3);
+}
+.alert-danger {
+  background: rgba(231,76,60,0.15);
+  color: var(--accent-red);
+  border: 1px solid rgba(231,76,60,0.3);
+}
+
+/* =============================================
+   SHARED — Badges
+   ============================================= */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.badge-blue   { background: rgba(0,123,255,0.15);  color: #399cff; border: 1px solid rgba(0,123,255,0.3); }
+.badge-green  { background: rgba(40,167,69,0.15);  color: #2ecc71; border: 1px solid rgba(40,167,69,0.3); }
+.badge-orange { background: rgba(255,193,7,0.15);  color: #f1c40f; border: 1px solid rgba(255,193,7,0.3); }
+.badge-gray   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+code {
+  font-family: monospace;
+  background: var(--surface2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--accent-red);
+}
+
+/* =============================================
+   HISTORY PAGE
+   ============================================= */
+.history-container {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.history-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.history-meta {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin: 0 0 16px 0;
+}
+
+.search-bar-wrapper { margin-bottom: 16px; }
+.search-bar-wrapper input {
+  width: 100%;
+  max-width: 340px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--text);
+  font-size: 13px;
+}
+.search-bar-wrapper input:focus {
+  outline: none;
+  border-color: var(--accent-yellow);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 13px;
+}
+th {
+  background-color: var(--surface2);
+  color: var(--text);
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  border-bottom: 2px solid var(--border);
+}
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+tr:hover td { background-color: rgba(255,255,255,0.02); }
+
+.vin-found   { color: var(--accent-green); font-weight: 600; font-family: monospace; font-size: 11px; }
+.vin-missing { color: var(--text-muted); font-style: italic; font-size: 11px; }
+.overflow-wrap { overflow-x: auto; }
+
+/* =============================================
+   REGISTER VEHICLE PAGE — Form Card
+   ============================================= */
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 0 80px 0;
+}
+
+.master-registration-card {
+  background: var(--surface);
+  width: 100%;
+  max-width: 760px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 48px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.form-main-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #fff;
+  margin: 0 0 12px 0;
+}
+
+.form-main-subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 48px;
+}
+
+.section-divider {
+  border-top: 1px solid var(--border);
+  margin: 44px 0 0 0;
+  padding-top: 20px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.radio-pill-box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 40px;
+  justify-content: center;
+  background: var(--background);
+  padding: 16px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.radio-circle,
+.checkbox-square { transform: scale(1.2); }
+
+select,
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="date"] {
+  width: 100%;
+  padding: 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background-color: var(--background);
+  color: #fff;
+  font-size: 13px;
+  box-sizing: border-box;
+}
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--accent-yellow);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.full-width { grid-column: span 2; }
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.required-star  { color: var(--accent-red); margin-left: 3px; }
+.dropdown-label { font-weight: 600; margin-bottom: 8px; }
+
+.vehicle-entry-node {
+  background: #151518;
+  border: 1px solid #222226;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.remove-node-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--accent-red);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.action-secondary-btn {
+  background: transparent;
+  border: 1px dashed var(--accent-yellow);
+  color: var(--accent-yellow);
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  width: 100%;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.passenger-panel-inner {
+  border-left: 3px solid var(--accent-green);
+  padding-left: 20px;
+  margin-bottom: 28px;
+}
+
+.panel-label-motor     { font-size: 13px; font-weight: 600; color: var(--accent-yellow); margin-bottom: 16px; text-transform: uppercase; }
+.panel-label-passenger { font-size: 13px; font-weight: 600; color: var(--accent-green);  margin-bottom: 16px; text-transform: uppercase; }
+
+.node-index-label {
+  font-size: 11px;
+  color: var(--accent-yellow);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+  margin-top: 40px;
+}
+
+.btn-reset {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-submit {
+  background: var(--accent-green);
+  border: none;
+  color: #fff;
+  padding: 12px 32px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-submit:hover { opacity: 0.9; }
+.btn-reset:hover  { background: var(--surface2); }

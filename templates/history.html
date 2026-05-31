@@ -1,79 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}History Archive — VIS{% endblock %}
+{% block title %}History Archive — LGU-DRIVE{% endblock %}
 {% block page_title %}Previous Applications Ledger Archive{% endblock %}
 
 {% block content %}
-<style>
-  /* Clean styling for our tracking table layout */
-  .history-container {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-    font-size: 13px;
-  }
-  
-  th {
-    background-color: var(--surface2);
-    color: var(--text);
-    text-align: left;
-    padding: 12px 16px;
-    font-weight: 600;
-    border-bottom: 2px solid var(--border);
-  }
-  
-  td {
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-  }
-  
-  tr:hover {
-    background-color: rgba(255, 255, 255, 0.02);
-  }
-
-  /* Status and ID badge design metrics */
-  .badge {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-  
-  .badge-blue { background-color: rgba(0, 123, 255, 0.15); color: #399cff; border: 1px solid rgba(0, 123, 255, 0.3); }
-  .badge-green { background-color: rgba(40, 167, 69, 0.15); color: #2ecc71; border: 1px solid rgba(40, 167, 69, 0.3); }
-  .badge-orange { background-color: rgba(255, 193, 7, 0.15); color: #f1c40f; border: 1px solid rgba(255, 193, 7, 0.3); }
-  .badge-gray { background-color: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-  
-  code {
-    font-family: monospace;
-    background-color: var(--surface2);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: #e74c3c;
-  }
-</style>
-
 <div class="history-container">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-    <h2 style="font-size: 16px; font-weight: 600; margin: 0;">System History Records Pipeline</h2>
+
+  <div class="history-header">
+    <h2>System History Records Pipeline</h2>
     <span class="badge badge-gray">Live Sync Mode</span>
   </div>
-  <p style="color: var(--text-muted); font-size: 13px; margin: 0 0 16px 0;">
-    Displaying real-time relational row sets across <code>application</code>, <code>donor</code>, <code>donee</code>, and <code>donatedvehicle</code> tables.
+
+  <p class="history-meta">
+    Displaying real-time relational row sets across
+    <code>application</code>, <code>donor</code>, <code>donee</code>, and <code>donatedvehicle</code> tables.
   </p>
 
-  <div style="overflow-x: auto;">
-    <table>
+  <div class="search-bar-wrapper">
+    <input type="text" id="searchInput" placeholder="🔍  Search records…">
+  </div>
+
+  <div class="overflow-wrap">
+    <table id="vehicleTable">
       <thead>
         <tr>
           <th>App ID</th>
@@ -91,17 +38,11 @@
         {% for row in records %}
         <tr>
           <td><span class="badge badge-blue">{{ row[0] }}</span></td>
-          
           <td style="white-space: nowrap;">{{ row[1] }}</td>
-          
           <td style="font-weight: 500;">{{ row[2] }}</td>
-          
           <td>{{ row[3] }}</td>
-          
           <td><code>{{ row[4] }}</code></td>
-          
           <td>{{ row[5] }}</td>
-          
           <td>
             {% if row[6] == 'Passenger Car' %}
               <span class="badge badge-green">Passenger Car</span>
@@ -109,20 +50,18 @@
               <span class="badge badge-orange">Motor Vehicle</span>
             {% endif %}
           </td>
-          
           <td><span class="badge badge-gray">{{ row[7] }}</span></td>
-          
-          <td style="font-family: monospace; font-size: 11px;">
+          <td>
             {% if row[8] %}
-              <span style="color: #2ecc71; font-weight: 600;">{{ row[8] }}</span>
+              <span class="vin-found">{{ row[8] }}</span>
             {% else %}
-              <span style="color: var(--text-muted); font-style: italic;">Surrogate General Tracked</span>
+              <span class="vin-missing">Surrogate General Tracked</span>
             {% endif %}
           </td>
         </tr>
         {% else %}
         <tr>
-          <td colspan="9" style="text-align: center; padding: 32px; color: var(--text-muted); font-style: italic;">
+          <td colspan="9" style="text-align:center; padding:32px; color:var(--text-muted); font-style:italic;">
             No historical document records populated inside the database server yet.
           </td>
         </tr>
@@ -130,5 +69,6 @@
       </tbody>
     </table>
   </div>
+
 </div>
 {% endblock %}

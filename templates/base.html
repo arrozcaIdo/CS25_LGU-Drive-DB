@@ -4,169 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}LGU-DRIVE Importation Module{% endblock %}</title>
-  
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  
-  <style>
-    /* Structural Layout Variables */
-    :root {
-      --sidebar-w: 260px;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--background, #121214);
-      color: var(--text, #e1e1e6);
-    }
-
-    /* Hidden-by-default Drawer Overlay */
-    .sidebar-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(2px);
-      display: none;
-      z-index: 998;
-    }
-    .sidebar-overlay.active {
-      display: block;
-    }
-
-    /* Collapsible Navigation Sidebar Drawer Shell */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: calc(-1 * var(--sidebar-w));
-      width: var(--sidebar-w);
-      height: 100vh;
-      background: var(--surface, #1a1a1e);
-      border-right: 1px solid var(--border, #29292e);
-      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-    }
-    .sidebar.active {
-      left: 0;
-    }
-
-    /* Sidebar Header Branding Zone */
-    .sidebar-brand {
-      padding: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--border, #29292e);
-    }
-    .brand-icon {
-      font-size: 24px;
-    }
-    .brand-title {
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: 0.5px;
-      color: #ffffff;
-    }
-    .brand-sub {
-      font-size: 11px;
-      color: var(--text-muted, #a8a8b3);
-    }
-
-    /* Clean Streamlined Sidebar Nav Links List */
-    .nav-links {
-      list-style: none;
-      padding: 16px 0;
-      margin: 0;
-      flex-grow: 1;
-    }
-    .nav-links li {
-      padding: 4px 16px;
-    }
-    .nav-links a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px;
-      color: var(--text-muted, #a8a8b3);
-      text-decoration: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-    .nav-links a:hover, .nav-links a.active {
-      background: var(--surface2, #29292e);
-      color: #ffffff;
-    }
-
-    /* Main Frame Area Setup */
-    .main-content {
-      margin-left: 0;
-      width: 100%;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Header Bar Top Fixed Panel */
-    .topbar {
-      height: 64px;
-      background: var(--surface, #1a1a1e);
-      border-bottom: 1px solid var(--border, #29292e);
-      display: flex;
-      align-items: center;
-      padding: 0 24px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    /* Hamburger Sidebar Open Button Icon */
-    .burger-btn {
-      font-size: 22px;
-      background: transparent;
-      border: none;
-      color: var(--text, #e1e1e6);
-      cursor: pointer;
-      padding: 6px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }
-    .burger-btn:hover {
-      background: var(--surface2, #29292e);
-    }
-
-    .page-title {
-      margin: 0;
-      font-size: 16px;
-      font-weight: 600;
-    }
-
-    /* Central Content Area Injector Slot padding */
-    .content-area {
-      padding: 32px 24px;
-      flex-grow: 1;
-    }
-
-    /* System Alert Notifications styles */
-    .alert {
-      padding: 12px 16px;
-      border-radius: 6px;
-      margin-bottom: 24px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-    .alert-success { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
-    .alert-danger { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
-  </style>
 </head>
 <body>
 
@@ -180,21 +18,23 @@
         <div class="brand-sub">Tracking Console Module</div>
       </div>
     </div>
-    
     <ul class="nav-links">
-      <li><a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
-        <span class="nav-icon">📝</span> Entry Form
-      </a></li>
-      
-      <li><a href="{{ url_for('history') }}" class="{% if request.endpoint == 'history' %}active{% endif %}">
-        <span class="nav-icon">📋</span> Previous Applications
-      </a></li>
+      <li>
+        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+          <span class="nav-icon">📝</span> Entry Form
+        </a>
+      </li>
+      <li>
+        <a href="{{ url_for('history') }}" class="{% if request.endpoint == 'history' %}active{% endif %}">
+          <span class="nav-icon">📋</span> Previous Applications
+        </a>
+      </li>
     </ul>
   </nav>
 
   <main class="main-content">
     <div class="topbar">
-      <div style="display: flex; align-items: center; gap: 16px;">
+      <div class="topbar-inner">
         <button class="burger-btn" id="burgerMenuTrigger" type="button">☰</button>
         <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
       </div>
@@ -211,18 +51,8 @@
     </div>
   </main>
 
-  <script>
-    const burgerTrigger  = document.getElementById('burgerMenuTrigger');
-    const sidebarMenu    = document.getElementById('sidebarMenu');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  {% block extra_js %}{% endblock %}
 
-    function toggleMenu() {
-      sidebarMenu.classList.toggle('active');
-      sidebarOverlay.classList.toggle('active');
-    }
-
-    burgerTrigger.addEventListener('click', toggleMenu);
-    sidebarOverlay.addEventListener('click', toggleMenu);
-  </script>
 </body>
 </html>
