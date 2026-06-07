@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_mysqldb import MySQL
+from werkzeug.utils import secure_filename
 import threading
 import webview
 import random
@@ -9,9 +10,13 @@ from datetime import date
 # ========================================================
 # SYSTEM CONFIGURATION & INITIALIZATION
 # ========================================================
+
+# Pin down the precise directory where app.py lives
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 app = Flask(__name__, 
-            template_folder='../templates',
-            static_folder='../static')
+            template_folder=os.path.join(BASE_DIR, 'templates'),
+            static_folder=os.path.join(BASE_DIR, 'static'))
 app.secret_key = 'super_secret_session_key'
 
 # Database Connection Parameters
@@ -22,6 +27,20 @@ app.config['MYSQL_DB']       = 'importationform'
 app.config['MYSQL_PORT']     = 37168
 mysql = MySQL(app)
 
+# FIXED: Folder path keeps uploaded signature images safely within your project folder
+SIGNATURE_FOLDER = os.path.join(BASE_DIR, 'static', 'signatures')
+
+def save_signature(file_obj, prefix, app_id):
+    """Save uploaded signature image; return relative path or None."""
+    if file_obj and file_obj.filename:
+        ext  = file_obj.filename.rsplit('.', 1)[-1].lower()
+        if ext in ('png', 'jpg', 'jpeg'):
+            os.makedirs(SIGNATURE_FOLDER, exist_ok=True)
+            fname = secure_filename(f"{prefix}_{app_id}.{ext}")
+            file_obj.save(os.path.join(SIGNATURE_FOLDER, fname))
+            return f"signatures/{fname}"
+    return None
+
 # ========================================================
 # 1. LANDING ROUTE: INTAKE CONSOLE PLATFORM
 # ========================================================
@@ -29,14 +48,12 @@ mysql = MySQL(app)
 def dashboard():
     cur = mysql.connection.cursor()
     
-    # Fetch distinct donors so our circular radio button lists can look up profiles
     cur.execute("SELECT DonorID, DonorName, DonorAddress, DonorTelNo, DonorFaxNo, DonorEmail FROM donor")
     donor_rows = cur.fetchall()
     donor_list = [{
         'id': d[0], 'name': d[1], 'address': d[2], 'tel': d[3], 'fax': d[4], 'email': d[5]
     } for d in donor_rows]
 
-    # Fetch distinct donees so our circular radio button lists can look up profiles
     cur.execute("SELECT DoneeID, DoneeName, DoneeAddress, ContactPerson, DoneeTelNo, DoneeFaxNo, DoneeEmail FROM donee")
     donee_rows = cur.fetchall()
     donee_list = [{
@@ -53,7 +70,6 @@ def dashboard():
 def history():
     cur = mysql.connection.cursor()
     
-    # Multi-table query joining all transactional rows cleanly
     cur.execute("""
         SELECT a.ApplicationID, a.ApplicationDate, dn.DoneeName, dr.DonorName, 
                dv.DonateID, dv.VehicleDescription, dv.CarType, dv.Quantity, pc.VIN
@@ -76,9 +92,7 @@ def history():
 def submit_vehicle():
     cur = mysql.connection.cursor()
     try:
-        # --------------------------------------------------------
         # A. EVALUATE DONEE PROFILE IDENTITY SELECTION
-        # --------------------------------------------------------
         donee_status = request.form.get('DoneeStatus', 'new')
         if donee_status == "existing" and request.form.get('ExistingDoneeID'):
             donee_id = request.form.get('ExistingDoneeID')
@@ -97,9 +111,7 @@ def submit_vehicle():
 
             cur.execute("INSERT INTO donee VALUES (%s,%s,%s,%s,%s,%s,%s)", (donee_id, d_name, d_addr, d_cont, d_tel, d_fax, d_email))
 
-        # --------------------------------------------------------
         # B. EVALUATE DONOR PROFILE IDENTITY SELECTION
-        # --------------------------------------------------------
         donor_status = request.form.get('DonorStatus', 'new')
         if donor_status == "existing" and request.form.get('ExistingDonorID'):
             donor_id = request.form.get('ExistingDonorID')
@@ -117,19 +129,21 @@ def submit_vehicle():
 
             cur.execute("INSERT INTO donor VALUES (%s,%s,%s,%s,%s,%s)", (donor_id, dr_name, dr_addr, dr_tel, dr_fax, dr_email))
 
-        # --------------------------------------------------------
         # C. GENERATE AUTOMATED TRACKING INDEX SEQUENCE
-        # --------------------------------------------------------
         cur.execute("SELECT COUNT(*) FROM application")
         current_count = cur.fetchone()[0]
-        app_id = f"APP{current_count + 1:02d}"  
+        app_id = f"APP{current_count + 1:02d}"
 
-        cur.execute("INSERT INTO application VALUES (%s,%s,%s,%s,%s)", (app_id, donee_id, donor_id, date.today(), '[signature_desktop.png]'))
+        donor_sig_file = request.files.get('AuthorizedSignature')
+        donee_sig_file = request.files.get('DoneeSignature')
+        donor_sig_path = save_signature(donor_sig_file, 'donor', app_id) or '[signature_desktop.png]'
+        save_signature(donee_sig_file, 'donee', app_id)
+
+        cur.execute("INSERT INTO application VALUES (%s,%s,%s,%s,%s)", (app_id, donee_id, donor_id, date.today(), donor_sig_path))
+
         vehicle_inserted = False
 
-        # --------------------------------------------------------
         # D. INDEPENDENT LOOP: PROCESS MOTOR VEHICLES ARRAY
-        # --------------------------------------------------------
         descriptions = request.form.getlist('VehicleDescription[]')
         tariffs      = request.form.getlist('VehicleTariff[]')
         quantities   = request.form.getlist('Quantity[]')
@@ -149,9 +163,7 @@ def submit_vehicle():
                         (donate_id, app_id, v_desc, v_tariff, v_origin, v_qty, "Motor Vehicle"))
             vehicle_inserted = True
 
-        # --------------------------------------------------------
         # E. INDEPENDENT BLOCK: PROCESS PASSENGER CAR DATA ENTITY
-        # --------------------------------------------------------
         p_desc = request.form.get('VehicleDescriptionSingle', '').strip()
         
         if p_desc:
@@ -165,10 +177,7 @@ def submit_vehicle():
             vin      = request.form.get('VIN', '').upper().strip()
             y_model  = request.form.get('YearModel') if request.form.get('YearModel') else 0
             disp     = request.form.get('EngineDisplacement') if request.form.get('EngineDisplacement') else 'N/A'
-            
-            # FIXED: Corrected the syntax bracket issue right here
             color    = request.form.get('Color') if request.form.get('Color') else 'N/A'
-            
             reg_date = request.form.get('RegistrationDate') if request.form.get('RegistrationDate') else None
             eng_no   = request.form.get('EngineNumber') if request.form.get('EngineNumber') else 'N/A'
             fuel     = request.form.get('FuelType', 'G')
@@ -194,13 +203,13 @@ def submit_vehicle():
     return redirect(url_for('history'))
 
 def run_flask():
-    app.run(port=5000, debug=False, use_reloader=False)
+    app.run(port=5000, debug=True, use_reloader=False)
 
 if __name__ == '__main__':
     targets = [
-        os.path.join("templates", "base.html"),
-        os.path.join("templates", "register_vehicle.html"),
-        os.path.join("templates", "history.html")
+        os.path.join(BASE_DIR, "templates", "base.html"),
+        os.path.join(BASE_DIR, "templates", "register_vehicle.html"),
+        os.path.join(BASE_DIR, "templates", "history.html")
     ]
     for file_path in targets:
         if os.path.exists(file_path):
@@ -227,3 +236,4 @@ if __name__ == '__main__':
         resizable=True
     )
     webview.start()
+
