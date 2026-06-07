@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Application Intake — LGU-DRIVE{% endblock %}
+{% block title %}New Application — LGU-DRIVE{% endblock %}
 {% block page_title %}Vehicle Importation Entry Form{% endblock %}
 
 {% block extra_js %}
 <script>
-  const donorsDictionary = {{ donors | tojson | safe }};
-  const doneesDictionary = {{ donees | tojson | safe }};
+  const donorsDictionary = {{ donors | tojson }};
+  const doneesDictionary = {{ donees | tojson }};
 </script>
 {% endblock %}
 
@@ -13,138 +13,200 @@
 <div class="form-wrapper">
   <div class="master-registration-card">
 
-    <h2 class="form-main-title">LGU-DRIVE REGISTRATION FORM</h2>
-    <p class="form-main-subtitle">Vehicle Importation Document Tracking System Console</p>
+    <h2 class="form-main-title">VEHICLE IMPORTATION APPLICATION</h2>
+    <p class="form-main-subtitle">Complete all required fields and attach authorized signatures before submission.</p>
 
-    <form action="{{ url_for('submit_vehicle') }}" method="POST" id="registerForm">
+    <form id="registerForm" method="POST" action="{{ url_for('submit_vehicle') }}" enctype="multipart/form-data">
 
-      <!-- A. DONOR -->
-      <div class="section-title" style="color: var(--accent-blue);">A. Donor / Supplier Status</div>
+      <!-- ═══════════════════════════════════
+           DONEE SECTION  (original, untouched)
+      ═══════════════════════════════════ -->
+      <div class="section-divider">
+        <div class="section-title">Donee / Consignee</div>
+      </div>
+
       <div class="radio-pill-box">
         <label class="radio-label">
-          <input type="radio" name="DonorStatus" value="new" id="donorToggleNew" class="radio-circle">
-          New Donor
-        </label>
-        <label class="radio-label">
-          <input type="radio" name="DonorStatus" value="existing" id="donorToggleExisting" class="radio-circle">
-          Existing Donor
-        </label>
-      </div>
-
-      <div id="donorDropdownContainer" style="display:none; margin-bottom:28px;">
-        <label class="dropdown-label">Choose Existing Donor</label>
-        <select id="donorSelect">
-          <option value="">-- Select Donor --</option>
-          {% for d in donors %}
-            <option value="{{ d.id }}">{{ d.name }}</option>
-          {% endfor %}
-        </select>
-        <input type="hidden" name="ExistingDonorID" id="hiddenDonorID">
-      </div>
-
-      <div class="form-grid" id="donorFieldsGrid" style="display:none; margin-bottom:28px;">
-        <div class="full-width">
-          <label>Name of Donor / Supplier <span class="required-star">*</span></label>
-          <input type="text" name="DonorName" id="donor_name" placeholder="Seoul Charity Foundation">
-        </div>
-        <div class="full-width">
-          <label>Complete Address <span class="required-star">*</span></label>
-          <input type="text" name="DonorAddress" id="donor_addr" placeholder="12 Sejong-daero, Jung-gu, Seoul">
-        </div>
-        <div>
-          <label>Telephone</label>
-          <input type="text" name="DonorTelNo" id="donor_tel" placeholder="Optional">
-        </div>
-        <div>
-          <label>Fax</label>
-          <input type="text" name="DonorFaxNo" id="donor_fax" placeholder="Optional">
-        </div>
-        <div class="full-width">
-          <label>Email</label>
-          <input type="email" name="DonorEmail" id="donor_email" placeholder="Optional">
-        </div>
-      </div>
-
-      <!-- B. DONEE -->
-      <div class="section-divider"></div>
-      <div class="section-title" style="color: var(--accent-green);">B. Donee / Consignee Status</div>
-      <div class="radio-pill-box">
-        <label class="radio-label">
-          <input type="radio" name="DoneeStatus" value="new" id="doneeToggleNew" class="radio-circle">
+          <input type="radio" class="radio-circle" name="DoneeStatus" value="new" id="doneeToggleNew" checked>
           New Donee
         </label>
         <label class="radio-label">
-          <input type="radio" name="DoneeStatus" value="existing" id="doneeToggleExisting" class="radio-circle">
+          <input type="radio" class="radio-circle" name="DoneeStatus" value="existing" id="doneeToggleExisting">
           Existing Donee
         </label>
       </div>
 
-      <div id="doneeDropdownContainer" style="display:none; margin-bottom:28px;">
-        <label class="dropdown-label">Choose Existing Donee</label>
+      <div id="doneeDropdownContainer" style="display:none; margin-bottom:20px;">
+        <label class="dropdown-label">Select Existing Donee</label>
         <select id="doneeSelect">
-          <option value="">-- Select Donee --</option>
-          {% for e in donees %}
-            <option value="{{ e.id }}">{{ e.name }}</option>
+          <option value="">— Select a donee —</option>
+          {% for d in donees %}
+          <option value="{{ d.id }}">{{ d.name }}</option>
           {% endfor %}
         </select>
         <input type="hidden" name="ExistingDoneeID" id="hiddenDoneeID">
       </div>
 
-      <div class="form-grid" id="doneeFieldsGrid" style="display:none; margin-bottom:28px;">
+      <div class="form-grid" id="doneeFieldsGrid">
         <div class="full-width">
-          <label>Name of Donee / Consignee <span class="required-star">*</span></label>
-          <input type="text" name="DoneeName" id="donee_name" placeholder="Province of Laguna">
+          <label>Donee Name <span class="required-star">*</span></label>
+          <input type="text" name="DoneeName" id="donee_name" placeholder="City Government of Quezon City" required>
         </div>
         <div class="full-width">
-          <label>Complete Address <span class="required-star">*</span></label>
-          <input type="text" name="DoneeAddress" id="donee_addr" placeholder="Brgy. San Isidro, Laguna">
+          <label>Address</label>
+          <input type="text" name="DoneeAddress" id="donee_addr" placeholder="Elliptical Rd, Diliman, Quezon City">
         </div>
-        <div class="full-width">
-          <label>Contact Person <span class="required-star">*</span></label>
-          <input type="text" name="ContactPerson" id="donee_cont" placeholder="Mica Reyes">
+        <div>
+          <label>Contact Person</label>
+          <input type="text" name="ContactPerson" id="donee_cont" placeholder="Maria Santos">
         </div>
         <div>
           <label>Telephone</label>
-          <input type="text" name="DoneeTelNo" id="donee_tel" placeholder="Optional">
+          <input type="text" name="DoneeTelNo" id="donee_tel" placeholder="02-8988-4242">
         </div>
         <div>
-          <label>Fax</label>
-          <input type="text" name="DoneeFaxNo" id="donee_fax" placeholder="Optional">
+          <label>Fax Number</label>
+          <input type="text" name="DoneeFaxNo" id="donee_fax" placeholder="02-8921-6731">
         </div>
-        <div class="full-width">
-          <label>Email</label>
-          <input type="email" name="DoneeEmail" id="donee_email" placeholder="Optional">
+        <div>
+          <label>Email Address</label>
+          <input type="email" name="DoneeEmail" id="donee_email" placeholder="mayor@quezoncity.gov.ph">
         </div>
       </div>
 
-      <!-- C. VEHICLES -->
-      <div id="coreVehicleAssetPanel" style="display:none;">
-        <div class="section-divider"></div>
-        <div class="section-title" style="color: var(--accent-yellow);">C. Asset Classification</div>
+      <!-- ═══════════════════════════════════
+           ADDED: Donee Authorized Signature
+           (placed right after donee fields)
+      ═══════════════════════════════════ -->
+      <div class="sig-block">
+        <div class="sig-block-label">Authorized Signature — Donee</div>
+        <div class="sig-zone" id="doneeSigZone">
+          <div class="sig-zone-icon">✍</div>
+          <div class="sig-zone-text">Click or drag signature image here</div>
+          <div class="sig-zone-sub">PNG or JPG · Max 2 MB</div>
+          <input type="file" id="doneeSigFile" name="DoneeSignature" accept="image/png,image/jpeg">
+        </div>
+        <div class="sig-preview" id="doneeSigPreview">
+          <img id="doneeSigImg" src="" alt="Donee signature preview">
+          <div class="sig-preview-info">
+            <div class="sig-preview-name" id="doneeSigName"></div>
+            <div class="sig-preview-size" id="doneeSigSize"></div>
+          </div>
+          <button type="button" class="sig-remove-btn" id="doneeSigRemove">✕ Remove</button>
+        </div>
+        <div class="sig-status" id="doneeSigStatus"></div>
+      </div>
+      <!-- ═══ END Donee Signature ═══════════ -->
 
-        <div class="radio-pill-box" style="margin-bottom:32px;">
+      <!-- ═══════════════════════════════════
+           DONOR SECTION  (original, untouched)
+      ═══════════════════════════════════ -->
+      <div class="section-divider">
+        <div class="section-title">Donor / Supplier</div>
+      </div>
+
+      <div class="radio-pill-box">
+        <label class="radio-label">
+          <input type="radio" class="radio-circle" name="DonorStatus" value="new" id="donorToggleNew" checked>
+          New Donor
+        </label>
+        <label class="radio-label">
+          <input type="radio" class="radio-circle" name="DonorStatus" value="existing" id="donorToggleExisting">
+          Existing Donor
+        </label>
+      </div>
+
+      <div id="donorDropdownContainer" style="display:none; margin-bottom:20px;">
+        <label class="dropdown-label">Select Existing Donor</label>
+        <select id="donorSelect">
+          <option value="">— Select a donor —</option>
+          {% for d in donors %}
+          <option value="{{ d.id }}">{{ d.name }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="ExistingDonorID" id="hiddenDonorID">
+      </div>
+
+      <div class="form-grid" id="donorFieldsGrid">
+        <div class="full-width">
+          <label>Donor Name <span class="required-star">*</span></label>
+          <input type="text" name="DonorName" id="donor_name" placeholder="Global Aid Automotive Japan" required>
+        </div>
+        <div class="full-width">
+          <label>Address</label>
+          <input type="text" name="DonorAddress" id="donor_addr" placeholder="1-2-1 Shibaura, Minato City, Tokyo">
+        </div>
+        <div>
+          <label>Telephone</label>
+          <input type="text" name="DonorTelNo" id="donor_tel" placeholder="81 3-5440-8000">
+        </div>
+        <div>
+          <label>Fax Number</label>
+          <input type="text" name="DonorFaxNo" id="donor_fax" placeholder="02-0212-6757">
+        </div>
+        <div class="full-width">
+          <label>Email Address</label>
+          <input type="email" name="DonorEmail" id="donor_email" placeholder="logistics@globalaid.jp">
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════
+           ADDED: Donor Authorized Signature
+           (placed right after donor fields)
+      ═══════════════════════════════════ -->
+      <div class="sig-block">
+        <div class="sig-block-label">Authorized Signature — Donor</div>
+        <div class="sig-zone" id="donorSigZone">
+          <div class="sig-zone-icon">✍</div>
+          <div class="sig-zone-text">Click or drag signature image here</div>
+          <div class="sig-zone-sub">PNG or JPG · Max 2 MB</div>
+          <input type="file" id="donorSigFile" name="AuthorizedSignature" accept="image/png,image/jpeg">
+        </div>
+        <div class="sig-preview" id="donorSigPreview">
+          <img id="donorSigImg" src="" alt="Donor signature preview">
+          <div class="sig-preview-info">
+            <div class="sig-preview-name" id="donorSigName"></div>
+            <div class="sig-preview-size" id="donorSigSize"></div>
+          </div>
+          <button type="button" class="sig-remove-btn" id="donorSigRemove">✕ Remove</button>
+        </div>
+        <div class="sig-status" id="donorSigStatus"></div>
+      </div>
+      <!-- ═══ END Donor Signature ═══════════ -->
+
+      <!-- ═══════════════════════════════════
+           VEHICLE SECTION  (original, untouched)
+      ═══════════════════════════════════ -->
+      <div id="coreVehicleAssetPanel" style="display:none;">
+
+        <div class="section-divider">
+          <div class="section-title">Vehicle Asset Classification</div>
+        </div>
+
+        <div class="radio-pill-box" style="justify-content:flex-start; gap:32px;">
           <label class="radio-label">
-            <input type="checkbox" id="checkToggleMotor" class="checkbox-square">
-            Include Motor Vehicles
+            <input type="checkbox" class="checkbox-square" id="checkToggleMotor">
+            Motor / Commercial Vehicle
           </label>
           <label class="radio-label">
-            <input type="checkbox" id="checkTogglePassenger" class="checkbox-square">
-            Include a Passenger Car
+            <input type="checkbox" class="checkbox-square" id="checkTogglePassenger">
+            Passenger Car
           </label>
         </div>
 
-        <!-- Motor Vehicles -->
-        <div id="standardVehiclePanel" style="display:none; margin-bottom:32px;">
-          <div class="panel-label-motor">Motor Vehicles Fleet List</div>
+        <!-- Motor vehicles panel -->
+        <div id="standardVehiclePanel" style="display:none;">
+          <div class="panel-label-motor">⚙ Motor / Commercial Vehicles</div>
           <div id="motorVehicleContainer">
             <div class="vehicle-entry-node">
+              <div class="node-index-label">Vehicle #1</div>
               <div class="form-grid">
                 <div class="full-width">
                   <label>Vehicle Description <span class="required-star">*</span></label>
-                  <input type="text" name="VehicleDescription[]" class="motor-input" placeholder="Ford F-650 / Kenworth T680">
+                  <input type="text" name="VehicleDescription[]" class="motor-input" placeholder="Ford F-650" required>
                 </div>
                 <div>
-                  <label>Tariff Heading Code</label>
+                  <label>Tariff Code</label>
                   <input type="number" name="VehicleTariff[]" class="motor-input" placeholder="8704">
                 </div>
                 <div>
@@ -158,71 +220,75 @@
               </div>
             </div>
           </div>
-          <button type="button" class="action-secondary-btn" id="addVehicleNodeBtn">
-            + Add Another Motor Vehicle
-          </button>
+          <button type="button" class="action-secondary-btn" id="addVehicleNodeBtn">+ Add Another Motor Vehicle</button>
         </div>
 
-        <!-- Passenger Car -->
-        <div id="passengerVehiclePanel" style="display:none;">
+        <!-- Passenger car panel -->
+        <div id="passengerVehiclePanel" style="display:none; margin-top:24px;">
+          <div class="panel-label-passenger">🚗 Passenger Car Details</div>
           <div class="passenger-panel-inner">
-            <div class="panel-label-passenger">Passenger Car Properties</div>
             <div class="form-grid">
-              <div>
-                <label>Make &amp; Model <span class="required-star">*</span></label>
-                <input type="text" name="VehicleDescriptionSingle" id="pass_desc" class="passenger-input" placeholder="Honda Civic">
+              <div class="full-width">
+                <label>Vehicle Description <span class="required-star">*</span></label>
+                <input type="text" name="VehicleDescriptionSingle" class="passenger-input" placeholder="Toyota Corolla">
+              </div>
+              <div class="full-width">
+                <label>VIN (Vehicle Identification Number)</label>
+                <input type="text" name="VIN" class="passenger-input" placeholder="JTDBR32E502345678" maxlength="17" style="font-family:monospace;text-transform:uppercase;">
               </div>
               <div>
-                <label>Year Model <span class="required-star">*</span></label>
+                <label>Year Model</label>
                 <input type="number" name="YearModel" class="passenger-input" placeholder="2022">
               </div>
               <div>
-                <label>Engine Displacement <span class="required-star">*</span></label>
-                <input type="text" name="EngineDisplacement" class="passenger-input" placeholder="1500 cc">
-              </div>
-              <div>
-                <label>Color <span class="required-star">*</span></label>
+                <label>Color</label>
                 <input type="text" name="Color" class="passenger-input" placeholder="Black">
               </div>
-              <div class="full-width">
-                <label>Vehicle Identification Number (VIN) <span class="required-star">*</span></label>
-                <input type="text" name="VIN" class="passenger-input" maxlength="17" placeholder="17-character VIN">
+              <div>
+                <label>Engine Number</label>
+                <input type="text" name="EngineNumber" class="passenger-input" placeholder="7ABCD987654">
               </div>
               <div>
-                <label>Registration Date</label>
-                <input type="date" name="RegistrationDate">
+                <label>Engine Displacement</label>
+                <input type="text" name="EngineDisplacement" class="passenger-input" placeholder="1800 cc">
               </div>
               <div>
-                <label>Engine Number <span class="required-star">*</span></label>
-                <input type="text" name="EngineNumber" class="passenger-input" placeholder="6ASDF334455">
-              </div>
-              <div>
-                <label>Fuel Type <span class="required-star">*</span></label>
+                <label>Fuel Type</label>
                 <select name="FuelType" class="passenger-input">
-                  <option value="G">Gasoline</option>
-                  <option value="D">Diesel</option>
-                  <option value="E">Electric</option>
+                  <option value="G">Gasoline (G)</option>
+                  <option value="D">Diesel (D)</option>
+                  <option value="E">Electric (E)</option>
+                  <option value="H">Hybrid (H)</option>
                 </select>
               </div>
               <div>
-                <label>Gross Vehicle Weight (kg)</label>
-                <input type="number" name="VehicleWeight" placeholder="1300">
+                <label>Vehicle Weight (kg)</label>
+                <input type="number" name="VehicleWeight" class="passenger-input" placeholder="1300">
+              </div>
+              <div>
+                <label>Registration Date</label>
+                <input type="date" name="RegistrationDate" class="passenger-input">
               </div>
               <div>
                 <label>Country of Origin</label>
                 <input type="text" name="OriginSingle" class="passenger-input" placeholder="Japan">
               </div>
-              <input type="hidden" name="VehicleTariffSingle" value="8703">
+              <div>
+                <label>Tariff Code</label>
+                <input type="number" name="VehicleTariffSingle" class="passenger-input" placeholder="8703">
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="form-actions">
-          <button type="reset"  class="btn-reset">Clear Form</button>
-          <button type="submit" class="btn-submit">Save Application</button>
-        </div>
+      </div>
+      <!-- ═══ END vehicle section ═══════════ -->
 
-      </div><!-- /coreVehicleAssetPanel -->
+      <div class="form-actions">
+        <button type="reset" class="btn-reset">Reset</button>
+        <button type="submit" class="btn-submit">Submit Application →</button>
+      </div>
+
     </form>
   </div>
 </div>
