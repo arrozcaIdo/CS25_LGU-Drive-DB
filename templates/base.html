@@ -7,9 +7,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
   <nav class="sidebar" id="sidebarMenu">
     <div class="sidebar-brand">
       <div class="brand-icon">🚛</div>
@@ -31,7 +29,6 @@
       </li>
     </ul>
   </nav>
-
   <main class="main-content">
     <div class="topbar">
       <div class="topbar-inner">
@@ -48,9 +45,7 @@
       {% block content %}{% endblock %}
     </div>
   </main>
-
   <script src="{{ url_for('static', filename='js/script.js') }}"></script>
   {% block extra_js %}{% endblock %}
-
 </body>
 </html>
