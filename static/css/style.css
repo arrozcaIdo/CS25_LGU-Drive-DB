@@ -656,3 +656,66 @@ input[name="VIN"] { font-family: monospace; text-transform: uppercase; }
 }
 .sig-status.ok  { display: block; background: rgba(46,204,113,0.1); color: var(--accent-green); border: 1px solid rgba(46,204,113,0.3); }
 .sig-status.err { display: block; background: rgba(231,76,60,0.1);  color: var(--accent-red);   border: 1px solid rgba(231,76,60,0.3); }
+
+/* =============================================
+   UI OVERHAUL: SCROLLBARS & FOCUS STATES
+   ============================================= */
+
+/* Premium Custom Dark Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface2);
+  border: 2px solid var(--background);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Form Input Glow Modifications */
+select, 
+input[type="text"], 
+input[type="number"], 
+input[type="email"], 
+input[type="date"] {
+  transition: border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+select:focus, 
+input:focus {
+  outline: none;
+  border-color: var(--accent-yellow) !important;
+  box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.15);
+}
+
+/* Adjust Focus Accent Color for Passenger Car Panel Inputs */
+.passenger-panel-inner input:focus {
+  border-color: var(--accent-green) !important;
+  box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.15);
+}
+
+/* Tactile Button Feedback */
+.btn-submit, 
+.btn-reset, 
+.action-secondary-btn, 
+.remove-node-btn,
+.sig-remove-btn {
+  transition: transform 0.1s ease, opacity 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-submit:active, 
+.action-secondary-btn:active {
+  transform: scale(0.98);
+}
+
+.btn-reset:active, 
+.remove-node-btn:active {
+  transform: scale(0.95);
+}
