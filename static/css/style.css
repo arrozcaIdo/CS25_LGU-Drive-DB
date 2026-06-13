@@ -719,3 +719,61 @@ input:focus {
 .remove-node-btn:active {
   transform: scale(0.95);
 }
+
+/* =============================================
+   UI OVERHAUL: SMOOTH CONTAINER ANIMATIONS
+   ============================================= */
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation Classes to Dynamic Targets */
+#standardVehiclePanel, 
+#passengerVehiclePanel, 
+#doneeDropdownContainer, 
+#donorDropdownContainer,
+.vehicle-entry-node {
+  animation: fadeInSlide 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Checkbox & Radio Styles */
+.radio-pill-box {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.radio-label:hover {
+  color: #fff;
+}
+
+.radio-circle, 
+.checkbox-square {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.radio-label:hover .radio-circle,
+.radio-label:hover .checkbox-square {
+  transform: scale(1.2);
+}
+
+/* Table Styling */
+.history-container {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#vehicleTable th {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+#vehicleTable th:hover {
+  background-color: var(--surface);
+  color: #fff;
+}
