@@ -159,8 +159,9 @@ def submit_vehicle():
             v_origin  = origins[i] if origins[i] else 'N/A'
             v_qty     = int(quantities[i]) if quantities[i] else 1
 
-            cur.execute("INSERT INTO donatedvehicle VALUES (%s,%s,%s,%s,%s,%s,%s)", 
-                        (donate_id, app_id, v_desc, v_tariff, v_origin, v_qty, "Motor Vehicle"))
+            # Explicit column names prevent database column shifting
+            cur.execute("""INSERT INTO donatedvehicle (DonateID, ApplicationID, VehicleDescription, VehicleTariff, Origin, Quantity, CarType) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)""", (donate_id, app_id, v_desc, v_tariff, v_origin, v_qty, "Motor Vehicle"))
             vehicle_inserted = True
 
         # E. INDEPENDENT BLOCK: PROCESS PASSENGER CAR DATA ENTITY
@@ -171,8 +172,9 @@ def submit_vehicle():
             v_tariff  = request.form.get('VehicleTariffSingle', 8703)
             v_origin  = request.form.get('OriginSingle', 'Japan')
 
-            cur.execute("INSERT INTO donatedvehicle VALUES (%s,%s,%s,%s,%s,%s,%s)", 
-                        (donate_id, app_id, p_desc, v_tariff, v_origin, 1, "Passenger Car"))
+           cur.execute("""INSERT INTO donatedvehicle (DonateID, ApplicationID, VehicleDescription, VehicleTariff, Origin, Quantity, CarType) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (donate_id, app_id, p_desc, v_tariff, v_origin, 1, "Passenger Car"))
             
             vin      = request.form.get('VIN', '').upper().strip()
             y_model  = request.form.get('YearModel') if request.form.get('YearModel') else 0
